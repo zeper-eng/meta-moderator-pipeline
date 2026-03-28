@@ -645,7 +645,7 @@ multiple_testing_and_remapping_labels <- function(model_output,lookup_df,methods
 
   # adjust p-values
   mo$results <- add_p_adjustments(mo$results, "Q_mod_p", methods)
-  mo$coefs   <- add_p_adjustments(mo$coefs, "P", methods)
+  mo$coefs   <- add_p_adjustments(mo$coefs, "p", methods)
 
   # apply labels ONLY to coefs
   mo$coefs <- apply_term_labels(mo$coefs, lookup_df)

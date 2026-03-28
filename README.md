@@ -4,4 +4,4 @@ I developed this pipeline while working on a systematic review in an academic cl
 
 The idea is that this repository contains a generalized and self-contained version of that pipeline; all datasets and results have been removed or replaced, and no proprietary or unpublished research data is included!
 
-Its only one big module inside the basg
+Its basically one big module inside of ```code/Analysis.R``` but 
