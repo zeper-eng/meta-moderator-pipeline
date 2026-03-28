@@ -1,2 +1,7 @@
 # meta-moderator-pipeline
-A modular meta-regression pipeline developed in an academic clinical research setting. This repository contains a generalized and self-contained version of that pipeline; all datasets and results have been removed or replaced, and no proprietary or unpublished research data is included.
+
+I developed this pipeline while working on a systematic review in an academic clinical research setting. 
+
+The idea is that this repository contains a generalized and self-contained version of that pipeline; all datasets and results have been removed or replaced, and no proprietary or unpublished research data is included!
+
+Its only one big module inside the basg
