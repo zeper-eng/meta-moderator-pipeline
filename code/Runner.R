@@ -9,8 +9,6 @@ library(here)
 
 source(here("code","Analysis.R"))
 
-dataset_name_var <- "synthetic_demo"
-
 ######################
 # Generate synthetic data
 ######################
@@ -18,17 +16,38 @@ dataset_name_var <- "synthetic_demo"
 df <- generate_synthetic_meta(200)
 
 ######################
-# Minimal recode + lookup (generic)
+# Recode + lookup
 ######################
 
-# Simple recode (will expand this later and explain what this is really for)
-recode_map <- list()
+# recoding for MODELING (factors)
+recode_map <- list(
+  # example (edit later as needed)
+  intensity_band = c(
+    "tier_1" = "low",
+    "tier_2" = "moderate",
+    "tier_3" = "high"
+  ),
+  contact_duration_band = c(
+    "brief" = "short",
+    "moderate" = "medium",
+    "extended" = "long"
+  )
+)
 
-# Minimal lookup table for labeling
+# lookup for DISPLAY (labels)
 lookup_df <- tibble(
-  predictor = character(),
-  code = character(),
-  label = character()
+  predictor = c(
+    "intensity_band","intensity_band","intensity_band",
+    "contact_duration_band","contact_duration_band","contact_duration_band"
+  ),
+  code = c(
+    "low","moderate","high",
+    "short","medium","long"
+  ),
+  label = c(
+    "Low intensity","Moderate intensity","High intensity",
+    "Short sessions","Medium sessions","Long sessions"
+  )
 )
 
 ######################
@@ -39,7 +58,6 @@ model <- run_meta_pipeline(
   df = df,
   recode_map = recode_map,
   out_dir = here(),
-  dataset_name = dataset_name_var,
   
   m1i = "group_a_mean",
   sd1i = "group_a_sd",
@@ -52,7 +70,7 @@ model <- run_meta_pipeline(
 )
 
 ######################
-# Multiple testing + labeling
+# Multiple testing + labeling (THIS handles mapping)
 ######################
 
 model <- multiple_testing_and_remapping_labels(
@@ -72,20 +90,47 @@ make_heatmaps(
 )
 
 ######################
-# Forest plots
+# Forest plots (split restored)
 ######################
 
 coef_df <- model$model_output$coefs
 
+# categorical predictors defined by lookup (same as original workflow)
+categorical_predictors <- unique(lookup_df$predictor)
+
+continuous_predictors <- setdiff(
+  unique(coef_df$predictor),
+  categorical_predictors
+)
+
 analyses <- unique(coef_df$target_construct)
 
+coef_cont <- coef_df %>%
+  filter(predictor %in% continuous_predictors)
+
+coef_cat <- coef_df %>%
+  filter(predictor %in% categorical_predictors)
+
+# Continuous
 walk(
   analyses,
   ~ plot_forest_analysis(
-      coef_df,
+      coef_cont,
       .x,
-      prefix = "all",
-      out_dir = here( "forestplots"),
+      prefix = "continuous",
+      out_dir = here("forestplots"),
+      desired_p_val = "P_adj_fdr"
+    )
+)
+
+# Categorical
+walk(
+  analyses,
+  ~ plot_forest_analysis(
+      coef_cat,
+      .x,
+      prefix = "categorical",
+      out_dir = here("forestplots"),
       desired_p_val = "P_adj_fdr"
     )
 )
@@ -98,12 +143,12 @@ dir.create("tables", recursive = TRUE, showWarnings = FALSE)
 
 write.csv(
   results_df,
-  file = paste0("tables/", "_qmod_results.csv"),
+  file = "tables/qmod_results.csv",
   row.names = FALSE
 )
 
 write.csv(
   coef_df,
-  file = paste0("tables/", "_coefs_results.csv"),
+  file = "tables/coefs_results.csv",
   row.names = FALSE
 )

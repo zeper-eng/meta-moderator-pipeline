@@ -695,82 +695,60 @@ plot_forest_analysis <- function(df, analysis_name, prefix, out_dir, desired_p_v
 ########################################################################
 
 generate_synthetic_meta <- function(n = 200) {
-  
   set.seed(123)
-  
+
   df <- tibble(
-    
-    # Core identifiers (fully generic)
-    target_construct = sample(
-      c("construct_a", "construct_b", "construct_c"),
-      n, replace = TRUE
-    ),
-    
-    source_id = paste0("src_", sample(1000:9999, n, replace = TRUE)),
-    
-    # Time / study info
-    measurement_stage = round(runif(n, 0, 5), 2),
-    pub_year = sample(2010:2025, n, replace = TRUE),
-    
-    # Group A (experimental)
-    group_a_mean = rnorm(n, mean = 50, sd = 20),
-    group_a_sd   = abs(rnorm(n, mean = 10, sd = 5)),
-    group_a_n    = sample(20:400, n, replace = TRUE),
-    
-    # Group B (control)
-    group_b_mean = rnorm(n, mean = 50, sd = 20),
-    group_b_sd   = abs(rnorm(n, mean = 10, sd = 5)),
-    group_b_n    = sample(20:400, n, replace = TRUE),
-    
-    # Meta-analysis outputs (synthetic placeholders)
-    study_weight = runif(n, 3, 6),
-    yi           = rnorm(n, 0.2, 0.5),
-    
-    ci_lower = yi - runif(n, 0.2, 0.6),
-    ci_upper = yi + runif(n, 0.2, 0.6),
-    
-    # Moderators (fully abstracted)
-    cohort_type = sample(
-      c("cohort_a", "cohort_b", "cohort_c"),
-      n, replace = TRUE
-    ),
-    
-    implementation_agent = sample(
-      c("agent_1", "agent_2", "agent_3"),
-      n, replace = TRUE
-    ),
-    
-    implementation_context = sample(
-      c("context_1", "context_2", "context_3"),
-      n, replace = TRUE
-    ),
-    
-    contact_duration_band = sample(
-      c("brief", "moderate", "extended"),
-      n, replace = TRUE
-    ),
-    
-    contact_count = sample(1:12, n, replace = TRUE),
-    
-    intensity_band = sample(
-      c("tier_1", "tier_2", "tier_3"),
-      n, replace = TRUE
-    ),
-    
-    exposure_window = sample(
-      c("window_a", "window_b", "window_c"),
-      n, replace = TRUE
-    ),
-    
-    onset_band = sample(
-      c("early", "mid", "late"),
-      n, replace = TRUE
-    ),
-    
-    group_balance_metric = as.character(round(runif(n, 30, 70), 1)),
-    
-    reporting_flag = sample(c("yes", "no"), n, replace = TRUE)
-  )
-  
-  return(df)
+    target_construct = sample(c("construct_a","construct_b","construct_c"), n, TRUE),
+    source_id = paste0("src_", seq_len(n)),
+
+    # continuous
+    measurement_stage = runif(n, 0, 5),
+    contact_count = sample(1:12, n, TRUE),
+
+    # categorical
+    intensity_band = sample(c("tier_1","tier_2","tier_3"), n, TRUE),
+    contact_duration_band = sample(c("brief","moderate","extended"), n, TRUE),
+
+    # sample sizes + SDs
+    group_a_n = sample(30:250, n, TRUE),
+    group_b_n = sample(30:250, n, TRUE),
+    group_a_sd = runif(n, 8, 18),
+    group_b_sd = runif(n, 8, 18)
+  ) %>%
+    mutate(
+      # baseline control group
+      group_b_mean = rnorm(n, 50, 10),
+
+      # structured effect
+      effect =
+        case_when(
+          target_construct == "construct_a" ~ 0.2,
+          target_construct == "construct_b" ~ 0.05,
+          TRUE ~ -0.1
+        ) +
+        if_else(intensity_band == "tier_3", 0.15, 0) +
+        if_else(contact_duration_band == "extended", 0.1, 0) +
+        0.01 * contact_count -
+        0.01 * measurement_stage +
+        rnorm(n, 0, 0.2),
+
+      pooled_sd = (group_a_sd + group_b_sd)/2,
+
+      # treatment group reflects effect
+      group_a_mean = group_b_mean + effect * pooled_sd,
+
+      # 🔥 NOW derive meta quantities (not random anymore)
+      yi = effect,
+
+      vi = (group_a_n + group_b_n) / (group_a_n * group_b_n) +
+           (yi^2 / (2 * (group_a_n + group_b_n))),
+
+      ci_lower = yi - 1.96 * sqrt(vi),
+      ci_upper = yi + 1.96 * sqrt(vi),
+
+      study_weight = 1 / vi
+    ) %>%
+    select(-effect, -pooled_sd)
+
+  df
 }
