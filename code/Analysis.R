@@ -505,25 +505,7 @@ make_heatmaps <- function(results_df, out_dir){
 #' )
 ########################################################################
 
-run_meta_pipeline <- function(
-  df,
-  recode_map,
-  out_dir,
-  dataset_name,
-  
-  m1i, sd1i, n1i,
-  m2i, sd2i, n2i,
-  
-  group_col = "target_construct",
-  numeric_cols = NULL,
-  drop_cols = NULL,
-  
-  run_eda = TRUE,
-  bin_num = 20,
-  
-  yi_col = "yi",
-  vi_col = "vi"
-) {
+run_meta_pipeline <- function(df,recode_map,out_dir,dataset_name,m1i, sd1i, n1i,m2i, sd2i, n2i,group_col = "target_construct",numeric_cols = NULL,drop_cols = c("source_id","group_a_mean","group_a_sd","group_a_n","group_b_mean","group_b_sd","group_b_n","study_weight","ci_lower","ci_upper"),run_eda = TRUE,bin_num = 20,yi_col = "yi",vi_col = "vi") {
   
   # 1. Recode categorical variables
   df_recoded <- map_categorical(df, recode_map)
@@ -545,23 +527,13 @@ run_meta_pipeline <- function(
   if (!is.null(drop_cols)) {
     df_es <- df_es %>% select(-any_of(drop_cols))
   }
-  
-  dir.create(file.path(out_dir, dataset_name), recursive = TRUE, showWarnings = FALSE)
-  
+    
   # 3. EDA
   if (run_eda) {
     
-    ggsave(
-      file.path(out_dir, dataset_name, "yi_hist.svg"),
-      exploratory_histogram(df_es, !!sym(yi_col), bin_num, group_col),
-      width = 16, height = 7
-    )
+    ggsave(file.path("Exploratory_Histograms", "yi_hist.svg"),exploratory_histogram(df_es, !!sym(yi_col), bin_num, group_col),width = 16, height = 7,create.dir = TRUE)
     
-    ggsave(
-      file.path(out_dir, dataset_name, "vi_hist.svg"),
-      exploratory_histogram(df_es, !!sym(vi_col), bin_num, group_col),
-      width = 16, height = 7
-    )
+    ggsave(file.path("Exploratory_Histograms", "vi_hist.svg"),exploratory_histogram(df_es, !!sym(vi_col), bin_num, group_col),width = 16, height = 7,create.dir = TRUE)
   }
   
   # 4. Run models

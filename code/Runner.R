@@ -68,7 +68,7 @@ results_df <- model$model_output$results
 
 make_heatmaps(
   results_df,
-  here("outputs", "heatmaps", dataset_name_var)
+  here("heatmaps")
 )
 
 ######################
@@ -85,7 +85,7 @@ walk(
       coef_df,
       .x,
       prefix = "all",
-      out_dir = here("outputs", "forestplots", dataset_name_var),
+      out_dir = here( "forestplots"),
       desired_p_val = "P_adj_fdr"
     )
 )
@@ -94,16 +94,16 @@ walk(
 # Save outputs
 ######################
 
-dir.create("outputs/tables", recursive = TRUE, showWarnings = FALSE)
+dir.create("tables", recursive = TRUE, showWarnings = FALSE)
 
 write.csv(
   results_df,
-  file = paste0("outputs/tables/", dataset_name_var, "_qmod_results.csv"),
+  file = paste0("tables/", "_qmod_results.csv"),
   row.names = FALSE
 )
 
 write.csv(
   coef_df,
-  file = paste0("outputs/tables/", dataset_name_var, "_coefs_results.csv"),
+  file = paste0("tables/", "_coefs_results.csv"),
   row.names = FALSE
 )
