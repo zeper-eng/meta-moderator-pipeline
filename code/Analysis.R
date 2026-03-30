@@ -737,7 +737,7 @@ generate_synthetic_meta <- function(n = 200) {
       # treatment group reflects effect
       group_a_mean = group_b_mean + effect * pooled_sd,
 
-      # 🔥 NOW derive meta quantities (not random anymore)
+      # NOW derive meta quantities 
       yi = effect,
 
       vi = (group_a_n + group_b_n) / (group_a_n * group_b_n) +
