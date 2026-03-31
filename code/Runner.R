@@ -8,7 +8,7 @@ library(metafor)
 library(here)
 
 source(here("code","Analysis.R"))
-
+source(here("code","Convenience.R"))
 ######################
 # Generate synthetic data
 ######################

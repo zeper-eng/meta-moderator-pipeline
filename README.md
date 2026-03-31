@@ -10,11 +10,11 @@ The core of the pipeline is implemented inside of ```code/Analysis.R``` but, I a
 
 This project stems from the analysis for one of the projects my current group is working on where we are exploring the effects of a range of interventions on early behavioral outcomes.
 
-We conducted a systematic review using standard screening tools (Covidence) to identify and extract data from a broad set of studies. These studies were then synthesized using established meta-analytic methods and software (Cochrane).
+We conducted a systematic review using standard screening tools (Covidence) to identify and extract data from a broad set of studies. These studies were then synthesized using established meta-analytic methods and software (Cochrane). The included studies varied in design, population characteristics, and intervention delivery, allowing us to examine patterns across diverse contexts.
 
-The included studies varied in design, population characteristics, and intervention delivery, allowing us to examine patterns across diverse contexts.
+The results of our preliminary meta-analysis hinted that our studies had high heterogneity implying our effect sizes (Hedge's G/SMD) were significantly different across studies.
 
-The results of our meta-analysis hinted that our 
+The meta regression is 
 
 
 ## 
