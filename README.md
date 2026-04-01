@@ -1,5 +1,8 @@
 # meta-moderator-pipeline
 
+
+A reusable R pipeline for conducting moderator analyses in meta-analytic studies, including effect size computation, meta-regression, and visualization.
+
 ## Intro and disclaimer
 
 The idea is that this repository contains a generalized and self-contained version of a pipeline I developed while working on a systematic review in an academic clinical research setting. All datasets and results have been removed or replaced, and no proprietary or unpublished research data is included!
